@@ -4,16 +4,14 @@ import webex
 
 sense = SenseHat()  #establish connection to hat
 
-temp_threshold = 120
+# Set threshold for temperature to alert admin
+temp_threshold = 80
 
-# Get temperature and print to console
+# Get temperature
 temp = sense.get_temperature()
-# print("Temperature in C = " +str(temp))
-
-
-# Get temperature and print to console
 tempF = temp *(9/5) + 32
-intTempF = int(tempF)
+intTempF = int(tempF) - 40
+# Subtracting 40 accounts for the processor running hot on the Pi
 # print("Temperature in F = " +str(intTempF))
 
 
@@ -23,19 +21,23 @@ intTempF = int(tempF)
 # print("Pressure = " +str(pressure))
 
 
-# Get humidity and print to console
+# Get humidity
 humidity = sense.get_humidity()
 intHumidity = int(humidity)
 # print("Humidity = " +str(intHumidity))
 
+# Connect to table
 database.init()
 
+# Add values to database
 database.add_new(intTempF, intHumidity)
 
+# Read table for debug purposes
 database.read_table()
 
-if (tempF > temp_threshold): 
-    webex.webex_alert("IT IS HOT")
 
+# Check temperature and alert the user
+if (intTempF > temp_threshold): 
+    webex.webex_alert("Temperature on Solar Panel 1 is %s degrees F" % (str(intTempF)))
 
 
